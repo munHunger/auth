@@ -1,0 +1,21 @@
+kind: pipeline
+type: kubernetes
+steps:
+  - name: test
+    image: node:alpine
+    commands:
+      - cd server
+      - npm install
+      - npm audit
+  - name: docker
+    image: plugins/kaniko
+    environment:
+      PLUGIN_USERNAME:
+        from_secret: docker_username
+      PLUGIN_PASSWORD:
+        from_secret: docker_password
+      PLUGIN_TAGS: server
+      PLUGIN_REPO: munhunger/auth
+      PLUGIN_DOCKERFILE: server/Dockerfile
+    settings:
+      context: server
