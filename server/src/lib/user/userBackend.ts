@@ -1,4 +1,5 @@
-import { user } from 'auth-domain';
+import domain from 'auth-domain';
+const { user } = domain;
 import shajs from 'sha.js';
 import crypto from 'crypto';
 import mongo from '$lib/mongo';

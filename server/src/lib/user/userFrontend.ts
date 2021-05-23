@@ -1,4 +1,5 @@
-import { user } from 'auth-domain';
+import domain from 'auth-domain';
+const { user } = domain;
 
 export class User extends user.UserAuthRequest {
 	constructor(auth: User) {

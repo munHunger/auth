@@ -21,7 +21,8 @@
 </script>
 
 <script>
-	import { user } from 'auth-domain';
+	import domain from 'auth-domain';
+	const { user } = domain;
 
 	export let users;
 </script>
