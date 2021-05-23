@@ -1,0 +1,253 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: auth
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongo-user
+  namespace: auth
+  annotations:
+    secret-generator.v1.mittwald.de/autogenerate: password
+data:
+  username: ZG0tc2NyZWVu
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwt-secret
+  namespace: auth
+  annotations:
+    secret-generator.v1.mittwald.de/autogenerate: secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node
+  namespace: auth
+  labels:
+    app: node
+    name: node
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: node
+  template:
+    metadata:
+      labels: # labels to select/identify the deployment
+        app: node
+        label: server
+    spec: # pod spec
+      containers:
+        - name: node
+          image: munhunger/auth:server
+          imagePullPolicy: "Always"
+          env:
+            - name: MONGO_URL
+              value: mongodb://mongo:27017
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: secret
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-user
+                  key: password
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-user
+                  key: username
+          ports:
+            - containerPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: auth
+  labels:
+    app: mongo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate #it is locking the db so we need downtime
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels: # labels to select/identify the deployment
+        app: mongo
+    spec: # pod spec
+      volumes:
+        - name: mongo-auth-pv
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: name
+                fieldRef:
+                  fieldPath: metadata.name
+      containers:
+        - name: mongo
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - mountPath: "/data/db"
+              name: mongo-auth-pv
+            - mountPath: "/etc/podinfo"
+              name: podinfo
+          env:
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-user
+                  key: password
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-user
+                  key: username
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express
+  namespace: auth
+  labels:
+    app: mongo-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels: # labels to select/identify the deployment
+        app: mongo-express
+    spec: # pod spec
+      containers:
+        - name: mongo-express
+          image: mongo-express:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-user
+                  key: password
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-user
+                  key: username
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-auth-pv
+  labels:
+    type: local
+spec:
+  storageClassName: "manual"
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/auth"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+  namespace: auth
+spec:
+  storageClassName: "manual"
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: 20Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: auth
+spec:
+  selector:
+    app: mongo
+  ports:
+    - port: 27017
+      protocol: TCP
+      targetPort: 27017
+      name: mongo
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express
+  namespace: auth
+spec:
+  selector:
+    app: mongo-express
+  ports:
+    - protocol: TCP
+      port: 8081
+      nodePort: 32112
+      targetPort: 8081
+      name: mongo-express
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node
+  namespace: auth
+spec:
+  selector:
+    app: node
+  ports:
+    - protocol: TCP
+      port: 3000
+      nodePort: 32111
+      targetPort: 3000
+      name: node
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auth-ingress
+  namespace: auth
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - auth.munhunger.com
+      secretName: auth-tls
+  rules:
+    - host: auth.munhunger.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: node
+                port:
+                  number: 3000
