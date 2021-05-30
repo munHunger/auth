@@ -6,6 +6,12 @@ export let get = async (req) => {
 	let db = await mongo.db('auth');
 	let users = await User.getAll(db);
 
+	if (!req.locals.authenticated) {
+		logger.debug(`not authenticated`);
+		return {
+			status: 401
+		};
+	}
 	logger.info(`fetching all users`);
 	return {
 		status: 200,

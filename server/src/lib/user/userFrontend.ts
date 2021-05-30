@@ -1,5 +1,4 @@
-import domain from 'auth-domain';
-const { user } = domain;
+import user from '$lib/user/user';
 
 export class User extends user.UserAuthRequest {
 	constructor(auth: User) {
@@ -15,8 +14,8 @@ export class User extends user.UserAuthRequest {
 			body: JSON.stringify(this)
 		});
 	}
-	async authenticate() {
-		return window.fetch('/login.json', {
+	async authenticate(service: [string]) {
+		return window.fetch('/login.json' + (service ? `?service=${service}` : ''), {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'

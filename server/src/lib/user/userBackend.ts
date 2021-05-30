@@ -1,5 +1,4 @@
-import domain from 'auth-domain';
-const { user } = domain;
+import user from '$lib/user/user';
 import shajs from 'sha.js';
 import crypto from 'crypto';
 import mongo from '$lib/mongo';
@@ -63,5 +62,20 @@ export class User extends user.UserAuth {
 					(v) => new User(v)
 				)
 			);
+	}
+	static async get(db, user: string) {
+		return mongo
+			.resolveCollection(db, 'users')
+			.then(
+				async (collection) =>
+					new User(
+						await collection.findOne({ email: user }, { projection: { _id: 0, salt: 0, sha: 0 } })
+					)
+			);
+	}
+
+	static validate(token) {
+		let u = jwt.verify(token, jwtSecret);
+		return u;
 	}
 }
