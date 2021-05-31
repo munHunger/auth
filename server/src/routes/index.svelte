@@ -38,7 +38,7 @@
 				/>
 				<div class="w-52 p-2">
 					<div class="text-lg font-bold">{user.username}</div>
-					<div class="text-gray-800 font-mono">{user.email}</div>
+					<div class="text-gray-800 text-xs font-mono">{user.email}</div>
 				</div>
 			</div>
 		{/each}
