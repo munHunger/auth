@@ -19,3 +19,7 @@ steps:
       PLUGIN_DOCKERFILE: server/Dockerfile
     settings:
       context: server
+  - name: deploy
+    image: sinlead/drone-kubectl
+    commands:
+      - kubectl --namespace="auth" rollout restart node
