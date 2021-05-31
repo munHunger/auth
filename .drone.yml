@@ -29,4 +29,4 @@ steps:
       kubernetes_token:
         from_secret: k8s_token
     commands:
-      - kubectl --namespace="auth" rollout restart node
+      - kubectl --namespace="auth" rollout restart deployment/node
