@@ -9,21 +9,19 @@ export class Service extends service.Service {
 		Object.assign(this, service);
 	}
 
-	auth(secret) {
+	auth(request) {
+		let hash = request.hash;
+		delete request.hash;
 		return (
 			shajs('sha256')
-				.update(secret + this.salt)
-				.digest('hex') === this.secret
+				.update(JSON.stringify(request) + this.secret)
+				.digest('hex') === hash
 		);
 	}
 
 	async create(db) {
 		let secret = crypto.randomBytes(32).toString('base64');
-		this.salt = crypto.randomBytes(32).toString('base64');
 
-		this.secret = shajs('sha256')
-			.update(secret + this.salt)
-			.digest('hex');
 		return mongo
 			.resolveCollection(db, 'services')
 			.then((collection) =>

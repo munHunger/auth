@@ -17,7 +17,6 @@ export class Service {
 	name: string;
 	callback: Array<string>;
 	secret: string;
-	salt: string;
 	requests: Array<AuthRequest>;
 
 	constructor(service: Service) {

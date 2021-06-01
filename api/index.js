@@ -1,12 +1,13 @@
-const http = require("http");
+const https = require("https");
 const jwt = require("jsonwebtoken");
+const sha = require("sha.js");
 function request(method, path, body) {
   return new Promise((resolve, reject) => {
-    let req = http.request(
+    let req = https.request(
       {
-        hostname: "localhost",
+        hostname: "auth.munhunger.com",
         method,
-        port: 3000,
+        port: 443,
         path,
         headers: {
           "Content-Type": "application/json",
@@ -47,11 +48,13 @@ function beginAuth(service, callbackURL) {
 }
 
 function auth(service, token, secret, jwtSecret) {
-  return request("POST", "/auth.json", {
-    service,
-    token,
-    secret,
-  }).then((data) => jwt.sign(data, jwtSecret));
+  let body = { service, token };
+  body.hash = sha("sha256")
+    .update(JSON.stringify(body) + secret)
+    .digest("hex");
+  return request("POST", "/auth.json", body).then((data) =>
+    jwt.sign(data, jwtSecret)
+  );
 }
 
 function verify(token, jwtSecret) {

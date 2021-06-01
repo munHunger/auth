@@ -11,7 +11,7 @@ const password = process.env['MONGO_PASSWORD'] || 'example';
  * @returns {Promise<import('mongodb').Collection>}
  */
 export function collection(db, name) {
-	logger.info(`connecting to mongo url=${url} user=${user} pass=${password}`);
+	logger.info(`connecting to mongo url=${url}`);
 	return new Promise((resolve, reject) =>
 		MongoClient.connect(url, { auth: { user, password } }).then((c) => {
 			c.db(db).collection(name, (err, res) => {
@@ -26,7 +26,7 @@ export function collection(db, name) {
  * @returns {Promise<import('mongodb').Database>}
  */
 export async function db(db) {
-	logger.info(`connecting to mongo url=${url} user=${user} pass=${password}`);
+	logger.info(`connecting to mongo url=${url}`);
 	return MongoClient.connect(url, { auth: { user, password } }).then((c) => c.db(db));
 }
 

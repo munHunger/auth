@@ -1,6 +1,6 @@
 {
-  "name": "auth-api",
-  "version": "1.0.0",
+  "name": "munhunger-auth-api",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "sha.js": "2.4.11",
     "jsonwebtoken": "8.5.1"
   }
 }

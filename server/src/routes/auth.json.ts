@@ -21,8 +21,8 @@ export let post = async (req) => {
 	let body = req.body;
 	console.log(body);
 	let service = await Service.getSingle(db, body.service);
-	if (!service.auth(body.secret)) {
-		logger.info(`no secret present`);
+	if (!service.auth(body)) {
+		logger.info(`hash did not match`);
 		return {
 			status: 401
 		};
