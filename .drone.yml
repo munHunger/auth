@@ -3,7 +3,11 @@ type: kubernetes
 steps:
   - name: test
     image: node:alpine
+    environment:
+      PLUGIN_USERNAME:
+        from_secret: username
     commands:
+      - printenv
       - cd server
       - npm install
       - npm audit
@@ -11,9 +15,9 @@ steps:
     image: plugins/kaniko
     environment:
       PLUGIN_USERNAME:
-        from_secret: docker_username
+        from_secret: username
       PLUGIN_PASSWORD:
-        from_secret: docker_password
+        from_secret: password
       PLUGIN_TAGS: server
       PLUGIN_REPO: munhunger/auth
       PLUGIN_DOCKERFILE: server/Dockerfile
@@ -30,3 +34,15 @@ steps:
         from_secret: k8s_token
     commands:
       - kubectl --namespace="auth" rollout restart deployment/node
+---
+kind: secret
+name: username
+get:
+  path: docker
+  name: username
+---
+kind: secret
+name: password
+get:
+  path: docker
+  name: password
