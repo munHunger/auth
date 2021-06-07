@@ -3,6 +3,7 @@
 	import { browser } from '$app/env';
 	export const load = async ({ session, page }) => {
 		let service = page.query.get('service');
+		let callback = page.query.get('callback');
 		console.log(page);
 		console.log(service);
 		if (!browser) {
@@ -13,7 +14,6 @@
 						status: 302
 					};
 				else {
-					let callback = page.query.get('callback');
 					console.log(callback);
 					return {
 						redirect: `callback?token=osdufhdfjgb`,
@@ -22,7 +22,7 @@
 				}
 			}
 		}
-		return { props: { service } };
+		return { props: { service, callback } };
 	};
 </script>
 
@@ -31,7 +31,7 @@
 	import { User } from '$lib/user/userFrontend';
 	import { goto } from '$app/navigation';
 	const store = getContext<Store>('store');
-	export let service;
+	export let service, callback;
 	import Home from '../components/home.svelte';
 	let email, password;
 	function login() {
@@ -45,7 +45,7 @@
 			.then((data) => {
 				console.log('authenticated: ' + data.jwt);
 				store.changeAuthenticationState(data);
-				// goto('/');
+				(window as any).location = callback + '?token=' + data.serviceToken;
 			});
 	}
 </script>

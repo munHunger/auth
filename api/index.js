@@ -67,3 +67,7 @@ module.exports = {
   auth,
   verify,
 };
+
+export default {
+  ...module.exports,
+};
