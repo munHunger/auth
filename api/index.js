@@ -52,9 +52,10 @@ function auth(service, token, secret, jwtSecret) {
   body.hash = sha("sha256")
     .update(JSON.stringify(body) + secret)
     .digest("hex");
-  return request("POST", "/auth.json", body).then((data) =>
-    jwt.sign(data, jwtSecret)
-  );
+  return request("POST", "/auth.json", body).then((data) => {
+    console.log("data:" + data);
+    return jwt.sign(data, jwtSecret);
+  });
 }
 
 function verify(token, jwtSecret) {
@@ -66,8 +67,4 @@ module.exports = {
   beginAuth,
   auth,
   verify,
-};
-
-export default {
-  ...module.exports,
 };

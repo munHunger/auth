@@ -20,14 +20,14 @@ export class Service extends service.Service {
 	}
 
 	async create(db) {
-		let secret = crypto.randomBytes(32).toString('base64');
+		this.secret = crypto.randomBytes(32).toString('base64');
 
 		return mongo
 			.resolveCollection(db, 'services')
 			.then((collection) =>
 				collection.updateOne({ name: this.name }, { $set: this }, { upsert: true })
 			)
-			.then(() => secret);
+			.then(() => this.secret);
 	}
 	static async getSingle(db, name) {
 		return mongo

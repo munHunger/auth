@@ -19,7 +19,6 @@ export let post = async (req) => {
 	let db = await mongo.db('auth');
 	logger.info('requesting auth for service');
 	let body = req.body;
-	console.log(body);
 	let service = await Service.getSingle(db, body.service);
 	if (!service.auth(body)) {
 		logger.info(`hash did not match`);
@@ -29,7 +28,7 @@ export let post = async (req) => {
 	} else {
 		let request = service.requests.find((req) => req.token === body.token);
 		if (!request) {
-			logger.info(`request does not exist on the service`);
+			logger.info(`request does not exist on the service`, { service, token: body.token });
 			return {
 				status: 400
 			};

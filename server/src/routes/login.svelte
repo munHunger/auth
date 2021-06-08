@@ -45,7 +45,7 @@
 			.then((data) => {
 				console.log('authenticated: ' + data.jwt);
 				store.changeAuthenticationState(data);
-				(window as any).location = callback + '?token=' + data.serviceToken;
+				(window as any).location = callback + '?token=' + encodeURIComponent(data.serviceToken);
 			});
 	}
 </script>
