@@ -25,7 +25,7 @@ export class Service extends service.Service {
 		return mongo
 			.resolveCollection(db, 'services')
 			.then((collection) =>
-				collection.updateOne({ name: this.name }, { $set: this }, { upsert: true })
+				collection.insertOne(this)
 			)
 			.then(() => this.secret);
 	}
