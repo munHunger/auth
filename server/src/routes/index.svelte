@@ -1,8 +1,17 @@
 <script context="module" lang="ts">
+	import { browser } from '$app/env';
 	/**
 	 * @type {import('@sveltejs/kit').Load}
 	 */
 	export async function load({ page, fetch, session, context }) {
+		if (!browser) {
+			if (!session.authenticated) {
+				return {
+					redirect: '/login',
+					status: 301
+				};
+			}
+		}
 		let url = `/index.json`;
 		const res = await fetch(url);
 		if (res.ok) {

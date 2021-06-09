@@ -1,8 +1,36 @@
 import mongo from '$lib/mongo';
-import { UserAuthRequest } from '$lib/user/userBackend';
+import { UserAuthRequest, User } from '$lib/user/userBackend';
 import { logger } from '$lib/logger';
 import { Service } from '$lib/service/serviceBackend';
 import { AuthRequest } from '$lib/service/service';
+
+export let get = async (req) => {
+	logger.info(`checking user token`);
+	if (!req.locals.authenticated) {
+		logger.info(`not authenticated`);
+		return { status: 401 };
+	} else {
+		let db = await mongo.db('auth');
+		let serviceName = req.query.get('service');
+		let user = User.validate(req.locals.token);
+		logger.info(`got user=${user.email} from session`);
+		logger.info(`Creating auth request to service=${serviceName}`);
+		let service = await Service.getSingle(db, serviceName);
+		if (!service)
+			return {
+				status: 404,
+				body: { error: 'service not found' }
+			};
+		let serviceToken = await service.createRequest(
+			db,
+			new AuthRequest({ email: user.email } as AuthRequest)
+		);
+		return {
+			status: 200,
+			body: { serviceToken }
+		};
+	}
+};
 
 export let put = async (req) => {
 	let body = req.body;

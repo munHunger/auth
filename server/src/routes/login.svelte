@@ -1,11 +1,9 @@
 <script context="module" lang="ts">
 	import { setContext, getContext } from 'svelte';
 	import { browser } from '$app/env';
-	export const load = async ({ session, page }) => {
+	export const load = async ({ session, page, fetch }) => {
 		let service = page.query.get('service');
 		let callback = page.query.get('callback');
-		console.log(page);
-		console.log(service);
 		if (!browser) {
 			if (session.authenticated) {
 				if (!service)
@@ -14,11 +12,14 @@
 						status: 302
 					};
 				else {
-					console.log(callback);
-					return {
-						redirect: `callback?token=osdufhdfjgb`,
-						status: 302
-					};
+					let login = await fetch(`/login.json?service=${service}`);
+					if (login.status === 200) {
+						let data = await login.json();
+						return {
+							redirect: `${callback}?token=${encodeURIComponent(data.serviceToken)}`,
+							status: 302
+						};
+					}
 				}
 			}
 		}
@@ -45,7 +46,9 @@
 			.then((data) => {
 				console.log('authenticated: ' + data.jwt);
 				store.changeAuthenticationState(data);
-				(window as any).location = callback + '?token=' + encodeURIComponent(data.serviceToken);
+				if (data.serviceToken)
+					(window as any).location = callback + '?token=' + encodeURIComponent(data.serviceToken);
+				else goto('/');
 			});
 	}
 </script>
