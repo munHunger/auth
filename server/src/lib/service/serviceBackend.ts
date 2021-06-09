@@ -25,7 +25,7 @@ export class Service extends service.Service {
 		return mongo
 			.resolveCollection(db, 'services')
 			.then((collection) =>
-				collection.insertOne(this)
+				Service.getSingle(db, this.name) ? undefined : collection.insertOne(this)
 			)
 			.then(() => this.secret);
 	}
