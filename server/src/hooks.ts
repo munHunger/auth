@@ -3,7 +3,7 @@ import { defaultState } from '$lib/store';
 import { User } from '$lib/user/userBackend';
 import * as cookie from 'cookie';
 
-export async function handle({ request, render }) {
+export async function handle({ request, resolve }) {
 	const headers = request.headers;
 	const cookies = cookie.parse(headers.cookie || '');
 	request.locals.token = cookies['token'];
@@ -11,7 +11,7 @@ export async function handle({ request, render }) {
 		let user = User.validate(request.locals.token);
 		request.locals.authenticated = user !== undefined;
 	}
-	const response = await render(request);
+	const response = await resolve(request);
 	return {
 		...response
 	};
