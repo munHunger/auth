@@ -15,7 +15,7 @@ const options = {
 			host: 'https://loki.munhunger.com'
 		}),
 		new winston.transports.Console({
-			level: 'info',
+			level: 'debug',
 			format: winston.format.combine(winston.format.colorize(), winston.format.simple())
 		})
 	]

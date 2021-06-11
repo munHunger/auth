@@ -5,7 +5,7 @@ import { Service } from '$lib/service/serviceBackend';
 import { AuthRequest } from '$lib/service/service';
 
 export let get = async (req) => {
-	logger.info(`checking user token`);
+	logger.debug(`checking user token`);
 	if (!req.locals.authenticated) {
 		logger.info(`not authenticated`);
 		return { status: 401 };

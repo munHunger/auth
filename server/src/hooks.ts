@@ -2,8 +2,6 @@ import { logger } from '$lib/logger';
 import { defaultState } from '$lib/store';
 import { User } from '$lib/user/userBackend';
 import * as cookie from 'cookie';
-const auth_token = 'demo_token_for_example';
-const userDetails = { name: 'Deb', age: 45 };
 
 export async function handle({ request, render }) {
 	const headers = request.headers;

@@ -17,8 +17,8 @@ export let get = async (req) => {
 
 export let post = async (req) => {
 	let db = await mongo.db('auth');
-	logger.info('requesting auth for service');
 	let body = req.body;
+	logger.info(`requesting auth for service=${body.service}`);
 	let service = await Service.getSingle(db, body.service);
 	if (!service.auth(body)) {
 		logger.info(`hash did not match`);
