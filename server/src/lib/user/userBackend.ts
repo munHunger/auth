@@ -40,7 +40,11 @@ export class UserAuthRequest extends user.UserAuthRequest {
 				email: user.email,
 				username: user.username
 			}),
-			jwtSecret
+			jwtSecret,
+			{
+				expiresIn: "7d",
+				issuer: 'auth'
+			}
 		);
 	}
 }
@@ -71,11 +75,15 @@ export class User extends user.UserAuth {
 					new User(
 						await collection.findOne({ email: user }, { projection: { _id: 0, salt: 0, sha: 0 } })
 					)
-			);
+			).then(user => {
+				delete user.salt;
+				delete user.sha;
+				return user;
+			});
 	}
 
 	static validate(token) {
-		let u = jwt.verify(token, jwtSecret);
+		let u = jwt.verify(token, jwtSecret, {issuer: 'auth'});
 		return u;
 	}
 }
