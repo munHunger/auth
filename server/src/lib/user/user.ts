@@ -1,7 +1,20 @@
+export enum AccessLevel {
+	READ = "READ", 
+	WRITE = "WRITE", 
+	NONE = "NONE"
+}
+
+export class AccessControl {
+	level: AccessLevel = AccessLevel.NONE;
+	service: string = '';
+	property: string = '';
+}
+
 export class User {
 	email: string = '';
 	username: string = '';
-
+	acl: Array<AccessControl> = [];
+	
 	constructor(user: User) {
 		Object.assign(this, user);
 	}
