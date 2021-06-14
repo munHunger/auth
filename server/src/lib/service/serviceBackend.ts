@@ -21,13 +21,32 @@ export class Service extends service.Service {
 
 	async create(db) {
 		this.secret = crypto.randomBytes(32).toString('base64');
-
-		return mongo
-			.resolveCollection(db, 'services')
-			.then((collection) =>
-				Service.getSingle(db, this.name) ? undefined : collection.insertOne(this)
-			)
-			.then(() => this.secret);
+		this.privateSecret = crypto.randomBytes(32).toString('base64');
+		await new Promise((resolve, reject) => {
+			crypto.generateKeyPair('rsa', {
+				modulusLength: 4096,
+				publicKeyEncoding: {
+				  type: 'spki',
+				  format: 'pem'
+				},
+				privateKeyEncoding: {
+				  type: 'pkcs8',
+				  format: 'pem',
+				  cipher: 'aes-256-cbc',
+				  passphrase: this.privateSecret
+				}
+			  }, (err, publicKey, privateKey) => {
+				  if(err) return reject(err);
+				  this.publicKey = publicKey;
+				  this.privateKey = privateKey;
+				  resolve(mongo
+					.resolveCollection(db, 'services')
+					.then((collection) =>
+						Service.getSingle(db, this.name) ? undefined : collection.insertOne(this)
+					)
+					.then(() => this.secret))
+			  });
+		})
 	}
 	static async getSingle(db, name) {
 		return mongo
