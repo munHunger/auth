@@ -2,6 +2,7 @@ import user from '$lib/user/user';
 import shajs from 'sha.js';
 import crypto from 'crypto';
 import mongo from '$lib/mongo';
+import keys from '$lib/keys';
 import jwt from 'jsonwebtoken';
 
 const jwtSecret = process.env['JWT_SECRET'] || 'secret';
@@ -35,16 +36,14 @@ export class UserAuthRequest extends user.UserAuthRequest {
 		let user = new User(
 			await mongo.resolveCollection(db, 'users').then((collection) => collection.findOne({ email }))
 		);
+		let key = await keys.getKeys(db);
 		return jwt.sign(
-			JSON.stringify({
+			{
 				email: user.email,
 				username: user.username
-			}),
-			jwtSecret,
-			{
-				expiresIn: "7d",
-				issuer: 'auth'
-			}
+			},
+			{ key: key.privateKey, passphrase: key.passphrase },
+			{ algorithm: 'RS256', expiresIn: '7d', issuer: 'auth' }
 		);
 	}
 }
@@ -75,15 +74,17 @@ export class User extends user.UserAuth {
 					new User(
 						await collection.findOne({ email: user }, { projection: { _id: 0, salt: 0, sha: 0 } })
 					)
-			).then(user => {
+			)
+			.then((user) => {
 				delete user.salt;
 				delete user.sha;
 				return user;
 			});
 	}
 
-	static validate(token) {
-		let u = jwt.verify(token, jwtSecret, {issuer: 'auth'});
+	static async validate(db, token) {
+		let key = await keys.getKeys(db);
+		let u = jwt.verify(token, key.publicKey, { issuer: 'auth' });
 		return u;
 	}
 }
