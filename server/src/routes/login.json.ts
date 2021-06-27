@@ -12,6 +12,7 @@ export let get = async (req) => {
 	} else {
 		let db = await mongo.db('auth');
 		let serviceName = req.query.get('service');
+		let token = req.query.get('token');
 		let user = await User.validate(db, req.locals.token);
 		logger.info(`got user=${user.email} from session`);
 		logger.info(`Creating auth request to service=${serviceName}`);
@@ -21,6 +22,13 @@ export let get = async (req) => {
 				status: 404,
 				body: { error: 'service not found' }
 			};
+		if (token) {
+			let serviceToken = await service.addEmailToRequest(db, user.email, token);
+			return {
+				status: 200,
+				body: { serviceToken }
+			};
+		}
 		let serviceToken = await service.createRequest(
 			db,
 			new AuthRequest({ email: user.email } as AuthRequest)

@@ -49,15 +49,30 @@ function registerService(name, callback) {
 }
 
 /**
+ * @typedef {Object} ACL
+ * @property {number} level access level of the property. 0=read, 1=write, 2=none
+ * @property {string} service if accessing root user data leave this blank, otherwise data related to the service
+ * @property {string} property the name of the property to access
+ */
+
+/**
  * Begin user authentication
  * @param {string} service name of the service
  * @param {string} callbackURL a url to direct users to after successful auth
- * @returns {string} a url to direct the user to in order to begin authentication
+ * @param {Array<ACL>} acl the requested access control list
+ * @returns {Promise<string>} a url to direct the user to in order to begin authentication
  */
-function beginAuth(service, callbackURL) {
-  return `https://auth.munhunger.com/login?service=${service}&callback=${encodeURIComponent(
-    callbackURL
-  )}`;
+async function beginAuth(service, secret, callbackURL, acl) {
+  let body = { service, acl };
+  body.hash = sha("sha256")
+    .update(JSON.stringify(body) + secret)
+    .digest("hex");
+  return await request("POST", "/beginAuth.json", body).then(
+    (token) =>
+      `https://auth.munhunger.com/login?token=${encodeURIComponent(
+        token
+      )}&service=${service}&callback=${callbackURL}`
+  );
 }
 
 let pubKey;
@@ -71,7 +86,6 @@ let pubKey;
 async function auth(service, token, secret) {
   if (!pubKey) pubKey = await request("GET", "/pub.key");
   let body = { service, token };
-  console.log(token);
   body.hash = sha("sha256")
     .update(JSON.stringify(body) + secret)
     .digest("hex");
@@ -88,9 +102,26 @@ async function verify(token) {
   return jwt.verify(token, pubKey, { issuer: "auth" });
 }
 
+/**
+ *
+ * @param {string} service name of the service
+ * @param {string} token the jwt of the user to update
+ * @param {string} secret the secret of this service
+ * @param {any} data the data to set
+ * @returns {Promise<string>} a new jwt
+ */
+async function putData(service, token, secret, data) {
+  let body = { service, token, data };
+  body.hash = sha("sha256")
+    .update(JSON.stringify(body) + secret)
+    .digest("hex");
+  return request("POST", "/user.json", body);
+}
+
 module.exports = {
   registerService,
   beginAuth,
   auth,
   verify,
+  putData,
 };

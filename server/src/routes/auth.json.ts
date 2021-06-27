@@ -5,13 +5,22 @@ import { Service } from '$lib/service/serviceBackend';
 
 export let get = async (req) => {
 	let service = req.query.get('service');
+	let token = req.query.get('token');
 	let db = await mongo.db('auth');
 
-	service = Service.getSingle(db, service);
-
-	logger.info(`authenticating user for service=${service.name}`);
+	logger.debug(token);
+	logger.info(`authenticating user for service=${service}`);
+	service = await Service.getSingle(db, service);
+	let request = service.requests.find((r) => r.token === token);
+	logger.info('requests', { request });
+	if (!request)
+		return {
+			status: 403,
+			body: 'no request found'
+		};
 	return {
-		status: 401
+		status: 200,
+		body: { acl: request.acl }
 	};
 };
 
@@ -42,7 +51,7 @@ export let post = async (req) => {
 		}
 		return {
 			status: 200,
-			body: await UserAuthRequest.getJWT(db, request.email)
+			body: await UserAuthRequest.getJWT(db, request.email, request.acl)
 		};
 	}
 };
