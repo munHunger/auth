@@ -1,5 +1,5 @@
 import winston from 'winston';
-// import LokiTransport from 'winston-loki';
+import LokiTransport from 'winston-loki';
 const options = {
 	level: 'info',
 	format: winston.format.json(),
@@ -11,9 +11,9 @@ const options = {
 		//
 		new winston.transports.File({ filename: '/tmp/log/auth-error.log', level: 'error' }),
 		new winston.transports.File({ filename: '/tmp/log/auth-combined.log' }),
-		// new LokiTransport({
-		// 	host: 'https://loki.munhunger.com'
-		// }),
+		new LokiTransport({
+			host: 'https://loki.munhunger.com'
+		}),
 		new winston.transports.Console({
 			level: 'debug',
 			format: winston.format.combine(winston.format.colorize(), winston.format.simple())
@@ -22,6 +22,4 @@ const options = {
 };
 export const logger = winston.createLogger(options);
 logger.debug('setting up logger');
-// console.error = (...args) => logger.error(args[0]);
-// console.log = (...args) => logger.log(args[0]);
-export default logger;
+export default { logger };
