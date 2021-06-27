@@ -9,31 +9,35 @@
 		"format": "prettier --write --plugin-search-dir=. .",
 		"start": "node build --prod"
 	},
+	"external": [
+		"snappy"
+	],
 	"devDependencies": {
-		"@sveltejs/kit": "next",
 		"@sveltejs/adapter-node": "next",
+		"@sveltejs/kit": "next",
 		"@typescript-eslint/eslint-plugin": "^4.19.0",
 		"@typescript-eslint/parser": "^4.19.0",
 		"autoprefixer": "^10.2.5",
+		"cookie": "0.4.1",
+		"cssnano": "^5.0.1",
+		"css-select": "4.1.3",
 		"eslint": "^7.22.0",
 		"eslint-config-prettier": "^8.1.0",
 		"eslint-plugin-svelte3": "^3.2.0",
-		"prettier": "~2.2.1",
+		"jsonwebtoken": "8.5.1",
 		"mongodb": "3.6.4",
 		"postcss": "^8.2.10",
-		"cssnano": "^5.0.1",
 		"postcss-load-config": "^3.0.1",
+		"prettier": "~2.2.1",
 		"prettier-plugin-svelte": "^2.2.0",
+		"sha.js": "2.4.11",
 		"svelte": "^3.34.0",
 		"svelte-preprocess": "^4.0.0",
+		"tailwindcss": "^2.2.4",
 		"tslib": "^2.0.0",
-		"tailwindcss": "^2.1.1",
 		"typescript": "^4.0.0",
 		"winston": "^3.3.3",
-		"winston-loki": "6.0.0",
-		"sha.js": "2.4.11",
-		"cookie": "0.4.1",
-		"jsonwebtoken": "8.5.1"
+		"winston-loki": "6.0.1"
 	},
 	"type": "module"
 }
