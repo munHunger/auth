@@ -40,10 +40,9 @@ export let post = async (req) => {
 				status: 400
 			};
 		}
-		console.log(user);
 		return {
 			status: 200,
-			body: user
+			body: UserAuthRequest.getJWT(db, request.email)
 		};
 	}
 };

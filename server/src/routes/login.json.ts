@@ -12,7 +12,7 @@ export let get = async (req) => {
 	} else {
 		let db = await mongo.db('auth');
 		let serviceName = req.query.get('service');
-		let user = User.validate(req.locals.token);
+		let user = User.validate(db, req.locals.token);
 		logger.info(`got user=${user.email} from session`);
 		logger.info(`Creating auth request to service=${serviceName}`);
 		let service = await Service.getSingle(db, serviceName);
