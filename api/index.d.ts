@@ -23,6 +23,6 @@ export function auth(service: string, token: string, secret: string): Promise<st
 /**
  * verify that a JWT token is correct
  * @param {string} token a jwt token to verify
- * @returns {Object} user data
+ * @returns {Promise<any>} user data
  */
-export function verify(token: string): any;
+export function verify(token: string): Promise<any>;

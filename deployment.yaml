@@ -14,14 +14,6 @@ metadata:
 data:
   username: YXV0aC1zZXJ2ZXI=
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: jwt-secret
-  namespace: auth
-  annotations:
-    secret-generator.v1.mittwald.de/autogenerate: secret
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -48,11 +40,6 @@ spec:
           env:
             - name: MONGO_URL
               value: mongodb://mongo:27017
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: jwt-secret
-                  key: secret
             - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -97,7 +84,7 @@ spec:
                   fieldPath: metadata.name
       containers:
         - name: mongo
-          image: mongo:latest
+          image: mongo:4.2
           ports:
             - containerPort: 27017
           volumeMounts:
@@ -136,7 +123,7 @@ spec:
     spec: # pod spec
       containers:
         - name: mongo-express
-          image: mongo-express:latest
+          image: mongo-express:0.54
           ports:
             - containerPort: 8081
           env:

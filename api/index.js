@@ -81,7 +81,7 @@ async function auth(service, token, secret) {
 /**
  * verify that a JWT token is correct
  * @param {string} token a jwt token to verify
- * @returns {Object} user data
+ * @returns {Promise<any>} user data
  */
 async function verify(token) {
   if (!pubKey) pubKey = await request("GET", "/pub.key");
