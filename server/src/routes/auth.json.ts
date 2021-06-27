@@ -42,7 +42,7 @@ export let post = async (req) => {
 		}
 		return {
 			status: 200,
-			body: UserAuthRequest.getJWT(db, request.email)
+			body: await UserAuthRequest.getJWT(db, request.email)
 		};
 	}
 };

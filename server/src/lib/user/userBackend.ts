@@ -82,7 +82,7 @@ export class User extends user.UserAuth {
 			});
 	}
 
-	static async validate(db, token) {
+	static async validate(db, token): Promise<User> {
 		let key = await keys.getKeys(db);
 		let u = jwt.verify(token, key.publicKey, { issuer: 'auth' });
 		return u;

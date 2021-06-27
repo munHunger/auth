@@ -2,6 +2,7 @@ import service, { AuthRequest } from '$lib/service/service';
 import shajs from 'sha.js';
 import crypto from 'crypto';
 import mongo from '$lib/mongo';
+import { logger } from '$lib/logger';
 
 export class Service extends service.Service {
 	constructor(service: Service) {
@@ -19,20 +20,26 @@ export class Service extends service.Service {
 		);
 	}
 
-	async create(db) {
+	async create(db): Promise<string> {
 		this.secret = crypto.randomBytes(32).toString('base64');
-		mongo
-			.resolveCollection(db, 'services')
-			.then((collection) =>
-				Service.getSingle(db, this.name) ? undefined : collection.insertOne(this)
-			)
-			.then(() => this.secret);
+		return mongo.resolveCollection(db, 'services').then(async (collection) => {
+			let stored = await Service.getSingle(db, this.name);
+			if (!stored) {
+				await collection.insertOne(this);
+				return this.secret;
+			}
+		});
 	}
 	static async getSingle(db, name) {
+		logger.debug('fetching single service', { name });
 		return mongo
 			.resolveCollection(db, 'services')
 			.then((collection) => collection.findOne({ name }, { projection: { _id: 0 } }))
-			.then((data) => new Service(data));
+			.then((data) => {
+				if (!data) return;
+				logger.debug('got service data', { data });
+				return new Service(data);
+			});
 	}
 
 	static async getAll(db) {

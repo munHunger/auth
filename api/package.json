@@ -1,11 +1,13 @@
 {
   "name": "munhunger-auth-api",
-  "version": "0.0.5",
+  "version": "0.0.8",
   "description": "",
   "main": "index.js",
+  "types": "index.d.ts",
   "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "types": "npx typescript *.js --declaration --allowJs --emitDeclarationOnly"
   },
   "author": "",
   "license": "ISC",

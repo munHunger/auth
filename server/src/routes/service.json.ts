@@ -7,8 +7,14 @@ export let post = async (req) => {
 	let db = await mongo.db('auth');
 	let service = new Service(body as Service);
 
-	logger.info(`creating service=${service.name}`);
+	logger.info(`creating service=${service.name}`, { service });
 	let secret = await service.create(db);
+	if (!secret) {
+		return {
+			status: 403,
+			body: 'service already exists'
+		};
+	}
 	return {
 		status: 200,
 		body: secret
