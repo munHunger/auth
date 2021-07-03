@@ -22,4 +22,5 @@ const options = {
 };
 export const logger = winston.createLogger(options);
 logger.debug('setting up logger');
+
 export default { logger };

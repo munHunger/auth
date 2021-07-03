@@ -1,5 +1,3 @@
-import { logger } from '$lib/logger';
-
 export enum AccessLevel {
 	READ = 'READ',
 	WRITE = 'WRITE',
@@ -71,7 +69,6 @@ export class User {
 		});
 		Object.assign(newUser, newUser.data);
 		delete newUser.data;
-		logger.debug('applied acl', { newUser });
 		newUser.acl = acl;
 		return newUser;
 	}
