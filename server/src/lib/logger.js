@@ -1,7 +1,7 @@
 import winston from 'winston';
 import LokiTransport from 'winston-loki';
 const options = {
-	level: 'info',
+	level: 'debug',
 	format: winston.format.json(),
 	defaultMeta: { labels: { service: 'auth', host: process.env['HOSTNAME'] } },
 	transports: [
