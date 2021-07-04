@@ -37,7 +37,18 @@ export class UserAuthRequest extends user.UserAuthRequest {
 	static async getJWT(db, email: string, acl?: Array<AccessControl>) {
 		let user = new User(
 			await mongo.resolveCollection(db, 'users').then((collection) => collection.findOne({ email }))
-		).applyACL(acl || []);
+		).applyACL(
+			acl || [
+				{
+					level: 0,
+					property: 'email'
+				} as AccessControl,
+				{
+					level: 0,
+					property: 'username'
+				} as AccessControl
+			]
+		);
 		let key = await keys.getKeys(db);
 		logger.debug('creating jwt', { user });
 		return jwt.sign(
