@@ -5,7 +5,7 @@ import { Service } from '$lib/service/serviceBackend';
 import { AuthRequest } from '$lib/service/service';
 
 export let get = async (req) => {
-	logger.debug(`checking user token`);
+	logger.debug(`checking user token`, { locals: req.locals });
 	if (!req.locals.authenticated) {
 		logger.info(`not authenticated`);
 		return { status: 401 };
@@ -14,7 +14,7 @@ export let get = async (req) => {
 		let serviceName = req.query.get('service');
 		let token = req.query.get('token');
 		let user = await User.validate(db, req.locals.token);
-		logger.info(`got user=${user.email} from session`);
+		logger.info(`got user=${user.email} from session`, { user });
 		logger.info(`Creating auth request to service=${serviceName}`);
 		let service = await Service.getSingle(db, serviceName);
 		if (!service)
