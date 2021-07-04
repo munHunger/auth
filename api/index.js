@@ -25,7 +25,8 @@ function request(method, path, body) {
 
         //the whole response has been received, so we just print it out here
         res.on("end", function () {
-          resolve(str);
+          if (res.statusCode === 200 || res.statusCode === 204) resolve(str);
+          reject(str);
         });
       }
     );

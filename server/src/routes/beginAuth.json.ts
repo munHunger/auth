@@ -21,7 +21,7 @@ export let post = async (req) => {
 	delete req.body.hash;
 	if (
 		shajs('sha256')
-			.update(JSON.stringify(request) + service.secret)
+			.update(JSON.stringify(req.body) + service.secret)
 			.digest('hex') !== hash
 	) {
 		logger.info('hash did not match');
