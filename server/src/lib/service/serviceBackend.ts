@@ -49,6 +49,7 @@ export class Service extends service.Service {
 	}
 
 	async addEmailToRequest(db, email: string, request: string) {
+		logger.debug(`adding email=${email} to request for service=${this.name}`);
 		return mongo
 			.resolveCollection(db, 'services')
 			.then((collection) =>
@@ -72,6 +73,7 @@ export class Service extends service.Service {
 	}
 
 	async createRequest(db, request: AuthRequest) {
+		logger.debug(`adding request to service=${this.name}`);
 		if (!this.requests) this.requests = [];
 		this.requests.push(request);
 		return mongo
