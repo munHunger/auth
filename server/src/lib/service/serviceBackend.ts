@@ -73,7 +73,7 @@ export class Service extends service.Service {
 	}
 
 	async createRequest(db, request: AuthRequest) {
-		logger.debug(`adding request to service=${this.name}`);
+		logger.debug(`adding request to service=${this.name}`, { request });
 		if (!this.requests) this.requests = [];
 		this.requests.push(request);
 		return mongo
