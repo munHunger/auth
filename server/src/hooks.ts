@@ -12,6 +12,7 @@ export async function handle({ request, resolve }) {
 		let db = await mongo.db('auth');
 		let user = await User.validate(db, request.locals.token);
 		request.locals.authenticated = user !== undefined;
+		request.locals.user = user;
 	}
 	const response = await resolve(request);
 	return {
@@ -29,6 +30,7 @@ export const getSession = async (req) => {
 		logger.info(`authenticated user=${user.email}`);
 		initialState.authenticated = user !== undefined;
 		initialState.token = token;
+		initialState.user = user;
 	}
 	return initialState;
 };

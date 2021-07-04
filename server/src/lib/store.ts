@@ -1,12 +1,15 @@
 import { Writable, writable } from 'svelte/store';
+import type { User } from './user/user';
 
 export interface stateType {
 	authenticated: boolean;
 	token: string;
+	user: User;
 }
 export const defaultState: stateType = {
 	authenticated: false,
-	token: null
+	token: null,
+	user: null
 };
 
 export default class Store {
